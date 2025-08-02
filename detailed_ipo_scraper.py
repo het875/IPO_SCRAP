@@ -14,6 +14,7 @@ from datetime import datetime
 from typing import Dict, List, Optional, Tuple
 import time
 import random
+from bs4 import BeautifulSoup
 
 # Add parent directory to path for imports
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
@@ -247,7 +248,6 @@ class DetailedIPOScraper:
                 return None
             
             # Parse the HTML content
-            from bs4 import BeautifulSoup
             soup = BeautifulSoup(response_content, 'html.parser')
             
             # Extract all the detailed data

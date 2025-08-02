@@ -4,6 +4,7 @@ This script fetches year-wise IPO summary data from investorgain.com API
 and saves it to the database with proper status classification.
 """
 
+
 import requests
 import json
 import re
@@ -12,9 +13,11 @@ from typing import Dict, List, Optional
 import logging
 from database.db_manager import DatabaseManager
 
+
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
+
 
 class IPOSummaryDatabaseManager(DatabaseManager):
     """Extended Database Manager for IPO Summary data"""
@@ -218,7 +221,7 @@ class IPOSummaryScraper:
     """Scraper for IPO summary data from investorgain.com"""
     
     def __init__(self):
-        self.base_url_template = "https://webnodejs.investorgain.com/cloud/report/data-read/394/1/7/{year}/2025-26/0/all"
+        self.base_url_template = "https://webnodejs.investorgain.com/cloud/report/data-read/394/1/{month}/{year}/2025-26/0/all"
         self.headers = {
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
             "Accept": "application/json, text/plain, */*",
@@ -354,17 +357,15 @@ class IPOSummaryScraper:
         return processed_record
     
     def fetch_year_data(self, year: int) -> List[Dict]:
-        """Fetch IPO data for a specific year"""
-        url = self.base_url_template.format(year=year)
+        """Fetch IPO data for a specific year, using current month dynamically"""
+        current_month = datetime.now().month  # Gets the current month (e.g., 8 for August)
+        url = self.base_url_template.format(month=current_month, year=year)
         
-        # Add search and version parameters based on year
-        if year >= 2023:
-            url += "?search=&v=22-55"
-        else:
-            url += "?search=&v=23-18"
+        # Optionally add query params if needed (e.g., for filtering), but keeping it minimal as per your example
+        url += "?search="  # Empty search; add &v= if tests show it's required for some years
         
         try:
-            logger.info(f"Fetching data for year {year} from: {url}")
+            logger.info(f"Fetching data for year {year} (using month {current_month}) from: {url}")
             
             response = requests.get(url, headers=self.headers, timeout=30)
             response.raise_for_status()
